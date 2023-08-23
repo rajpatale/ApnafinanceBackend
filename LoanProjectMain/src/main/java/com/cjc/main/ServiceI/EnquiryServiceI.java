@@ -18,4 +18,6 @@ public interface EnquiryServiceI {
 
 	Iterable<EnquiryDetails> enquirysByStatus(String status1, String status2);
 
+	EnquiryDetails updateUserStatus(int eid);
+
 }

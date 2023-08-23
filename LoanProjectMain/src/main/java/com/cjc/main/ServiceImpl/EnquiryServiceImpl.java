@@ -1,6 +1,7 @@
 package com.cjc.main.ServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -83,6 +84,21 @@ public class EnquiryServiceImpl implements EnquiryServiceI{
 		}
 		
 	
+	}
+
+
+	@Override
+	public EnquiryDetails updateUserStatus(int eid) {
+
+		Optional<EnquiryDetails> findById = er.findById(eid);
+		EnquiryDetails enquiryDetails = findById.get();
+		
+		enquiryDetails.setEnquiryStatus(String.valueOf(EnquiryStatus.CIBIL_REQUIRED));
+		
+		er.save(enquiryDetails);
+		
+		
+		return enquiryDetails;
 	}
 
 }
