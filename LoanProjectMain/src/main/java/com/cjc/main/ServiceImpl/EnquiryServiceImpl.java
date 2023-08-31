@@ -86,6 +86,8 @@ public class EnquiryServiceImpl implements EnquiryServiceI{
 	
 	}
 
+	
+	
 
 	@Override
 	public EnquiryDetails updateUserStatus(int eid) {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.cjc.main.ServiceI.EnquiryServiceI;
 import com.cjc.main.exceptionE.EmployeeNotFoundException;
@@ -27,6 +28,9 @@ import com.cjc.main.model.EnquiryDetails;
 @RestController
 @RequestMapping("/Enquiry")
 public class EnquiryController {
+	
+	@Autowired
+	RestTemplate rs;
 
 	@Autowired
 	EnquiryServiceI es;
@@ -80,6 +84,17 @@ public class EnquiryController {
 		EnquiryDetails e= es.updateUserStatus(eid);
 		return e;
 	}
+	
+	@GetMapping("/checkCibil/{pancardNumber}")
+	public int checkCibil(@PathVariable("pancardNumber") String pancardNumber)
+	{
+		String url="http://localhost:8080/getCibilScore/"+pancardNumber;
+		Integer cibilScore=rs.getForObject(url, Integer.class);
+		return cibilScore;
+				
+		
+	}
+	
 
     
 
