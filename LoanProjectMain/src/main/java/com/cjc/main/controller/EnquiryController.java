@@ -21,6 +21,7 @@ import com.cjc.main.ServiceI.EnquiryServiceI;
 import com.cjc.main.exceptionE.EmployeeNotFoundException;
 import com.cjc.main.exceptionE.EnquiryNotSoundException;
 import com.cjc.main.model.BaseResponce;
+import com.cjc.main.model.Cibil;
 import com.cjc.main.model.EmployeeInfo;
 import com.cjc.main.model.EnquiryDetails;
 
@@ -78,19 +79,27 @@ public class EnquiryController {
 	}
 	
 	@PutMapping("/updateUserStatus/{eId}")
-	public EnquiryDetails updateUserStatus(@PathVariable ("eId") int eid  )
+	public ResponseEntity<BaseResponce<EnquiryDetails>> updateUserStatus(@PathVariable ("eId") int eid,  @RequestBody EnquiryDetails ed  )
 	{
 		
-		EnquiryDetails e= es.updateUserStatus(eid);
-		return e;
+		EnquiryDetails e= es.updateUserStatus(eid, ed);
+		return new ResponseEntity<BaseResponce<EnquiryDetails>>(new BaseResponce<EnquiryDetails>(200, "ENQUIRY SEND OE",
+                new Date(), e),HttpStatus.OK);	
 	}
 	
 	@GetMapping("/checkCibil/{pancardNumber}")
-	public int checkCibil(@PathVariable("pancardNumber") String pancardNumber)
+	public ResponseEntity<BaseResponce<Integer>> checkCibil(@RequestBody EnquiryDetails e)
 	{
-		String url="http://localhost:8080/getCibilScore/"+pancardNumber;
-		Integer cibilScore=rs.getForObject(url, Integer.class);
-		return cibilScore;
+    	e.setCibil(new Cibil());
+		String url="http://localhost:8080/getCibilScore/"+e.getPancardNumber();
+		Integer cibil=rs.getForObject(url, Integer.class);
+	      e.getCibil().setCibilScore(cibil);
+	  	EnquiryDetails e2 = es.updateUserStatus(e.getEid() ,e);
+	      
+   	
+    	
+    	return new ResponseEntity<BaseResponce<Integer>>(new BaseResponce<Integer>(200, "CIBIL FOUND",
+    										new Date(),e2.getCibil().getCibilScore()),HttpStatus.OK);
 				
 		
 	}

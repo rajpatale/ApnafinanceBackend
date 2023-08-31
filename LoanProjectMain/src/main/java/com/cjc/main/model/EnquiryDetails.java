@@ -20,7 +20,7 @@ public class EnquiryDetails {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer eId;
+	private Integer eid;
 	private String firstName;
 	private String lastName;
 	private Integer age;

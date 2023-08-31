@@ -1,5 +1,6 @@
 package com.cjc.main.ServiceImpl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import com.cjc.main.Repository.EnquiryRepository;
 import com.cjc.main.ServiceI.EnquiryServiceI;
+import com.cjc.main.enums.Cibil_Status;
 import com.cjc.main.enums.EnquiryStatus;
 import com.cjc.main.exceptionE.EnquiryNotSoundException;
+import com.cjc.main.model.Cibil;
 import com.cjc.main.model.EmployeeInfo;
 import com.cjc.main.model.EnquiryDetails;
 
@@ -90,17 +93,69 @@ public class EnquiryServiceImpl implements EnquiryServiceI{
 	
 
 	@Override
-	public EnquiryDetails updateUserStatus(int eid) {
+	public EnquiryDetails updateUserStatus(int eid , EnquiryDetails ed) {
 
-		Optional<EnquiryDetails> findById = er.findById(eid);
-		EnquiryDetails enquiryDetails = findById.get();
+		System.out.println("In Service Impl");
 		
-		enquiryDetails.setEnquiryStatus(String.valueOf(EnquiryStatus.CIBIL_REQUIRED));
+		EnquiryDetails e = er.findByEid(eid);
+		if(e.getCibil()==null)
+		{
+			e.setCibil(new Cibil());
+		}
+		String enquiryStatus = e.getEnquiryStatus();
+		if(enquiryStatus.equals("CREATED"))
+		{
+			
+			e.setEnquiryStatus(EnquiryStatus.CIBIL_REQUIRED.toString());
 		
-		er.save(enquiryDetails);
+			er.save(e);
+			return e;
+		}else if(enquiryStatus.equals("CIBIL_REQUIRED"))
+		{
+			
+			e.setEnquiryStatus(EnquiryStatus.CIBIL_CHECKED.toString());
+			e.getCibil().setCibilScore(ed.getCibil().getCibilScore());;
+			if(e.getCibil().getCibilScore()<650)
+			{
+				e.getCibil().setCibilRemark("cibil score is low");
+				e.getCibil().setCibilStatus(Cibil_Status.LOW_CIBIL.toString());
+				e.getCibil().setCibilScoreDateTime(new Date().toString());
+				return er.save(e);
+			}
+			else if(e.getCibil().getCibilScore()<750 && e.getCibil().getCibilScore()>650)
+			{
+				e.getCibil().setCibilRemark("cibil score is good");
+				e.getCibil().setCibilStatus(Cibil_Status.AVRAGE_CIBIL.toString());
+				e.getCibil().setCibilScoreDateTime(new Date().toString());
+				return er.save(e);
+			}
+			else if(e.getCibil().getCibilScore()>750 && e.getCibil().getCibilScore()<900)
+			{
+				e.getCibil().setCibilRemark("cibil score is high");
+				e.getCibil().setCibilStatus(Cibil_Status.HIGH_CIBIL.toString());
+				e.getCibil().setCibilScoreDateTime(new Date().toString());
+				return er.save(e);
+			}else{
+				//throw CibilCoreNotApplicabelException
+				
+			}
 		
-		
-		return enquiryDetails;
+	
+		}
+		 if (enquiryStatus.equals("CIBIL_CHECKED")) {
+			if(e.getCibil().getCibilScore()>650)
+			{
+				e.setEnquiryStatus(EnquiryStatus.CIBIL_APROVED.toString());
+				er.save(e);
+				return e;
+			}else {
+				e.setEnquiryStatus(EnquiryStatus.CIBIL_REJECT.toString());
+				er.save(e);
+				return e;
+			}
+			
+		}
+		return null;
 	}
 
 }
