@@ -53,6 +53,8 @@ public class EnquiryController {
 
 	}
 
+	
+	
 	@GetMapping("/findFirstName{firstName}")
 	public ResponseEntity<BaseResponce<List<EnquiryDetails>>> findFirstName(@PathVariable("firstName") String firstName)
 			throws EnquiryNotSoundException {
